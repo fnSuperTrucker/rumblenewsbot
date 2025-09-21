@@ -1,1 +1,1 @@
-this is the story 0of a name tag wearer
+this is the story of a name tag wearer
