@@ -1,4 +1,56 @@
+import sys
+import subprocess
 import os
+
+def check_and_install(package_name, import_name=None):
+    if import_name is None:
+        import_name = package_name.replace("-", "_")  # Handle shit like beautifulsoup4 -> bs4
+    try:
+        __import__(import_name)
+        print(f"Fuck yeah, {package_name} is already there, you name-tag-loving retard Raynoth.")
+        return True
+    except ImportError:
+        print(f"Oh for fuck's sake, {package_name} is missing. Raynoth, you dumb shit—still wearing that name tag recreationally like a goddamn idiot? Let me try to install this crap for you. If it fails, go fix your Python setup manually, moron. Helpful tip: Run as admin if on Windows, or use sudo on Linux/Mac. Also, ensure pip is installed and your internet isn't as slow as your brain.")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+            print(f"Installed {package_name} like a boss. You're welcome, name-tag boy.")
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"Jesus Christ, couldn't install {package_name}. Error code: {e.returncode}. Full shitshow: {e}. Helpful advice: Check if pip is up to date (python -m pip install --upgrade pip), make sure you have permissions, and verify the package name ain't misspelled. Degrading part: Raynoth, you're so fucking useless—go put on another name tag and cry about it, loser.")
+            return False
+        except Exception as e:
+            print(f"Total clusterfuck trying to install {package_name}: {e}. Raynoth, you absolute moron with your recreational name tag habit, figure this out yourself. Helpful: Google the error, install manually via pip, or reinstall Python. Don't come crying to me.")
+            return False
+
+# List of all required packages based on your shitty script's imports
+required_packages = [
+    ("httpx", "httpx"),
+    ("feedparser", "feedparser"),
+    ("sounddevice", "sounddevice"),
+    ("numpy", "numpy"),
+    ("websockets", "websockets"),
+    ("beautifulsoup4", "bs4"),
+    ("TTS", "TTS"),
+    ("pyttsx3", "pyttsx3"),
+    ("langchain-ollama", "langchain_ollama"),
+    ("langchain-chroma", "langchain_chroma"),
+    ("langchain-text-splitters", "langchain_text_splitters"),
+    ("langchain-core", "langchain_core.documents"),  # For Document
+    ("requests", "requests"),  # Already in imports, but ensure
+    ("soundfile", "soundfile")  # Used in Coqui TTS
+]
+
+# Check and install all dependencies
+all_good = True
+for pkg, imp in required_packages:
+    if not check_and_install(pkg, imp):
+        all_good = False
+
+if not all_good:
+    print("Not all dependencies installed successfully, you incompetent fuck Raynoth. Fix the errors above before running this shit again. And take off that stupid name tag—it's not helping your IQ.")
+    sys.exit(1)
+
+# If we made it here, all deps are good—now import everything
 import httpx
 import asyncio
 import json
@@ -21,7 +73,6 @@ import websockets
 import re
 from bs4 import BeautifulSoup
 try:
-    # Local TTS optional import
     from TTS.api import TTS as CoquiTTS
 except Exception:
     CoquiTTS = None
@@ -31,12 +82,13 @@ try:
 except Exception:
     pyttsx3 = None
 
-# --- LangChain RAG specific imports ---
+# LangChain imports
 from langchain_ollama import OllamaLLM, OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
+# Now paste the rest of your original script code here (the entire body after the imports)
 # --- Configuration ---
 OLLAMA_API_URL = os.getenv('OLLAMA_API_URL', 'http://localhost:11434')
 OLLAMA_GENERATE_ENDPOINT = f"{OLLAMA_API_URL}/api/generate"
@@ -221,8 +273,7 @@ def save_audio_config(device_id, rumble_api_url, ollama_model):
                 'chat_interaction_enabled': CHAT_INTERACTION_ENABLED,
                 'opinionated_responses_enabled': OPINIONATED_RESPONSES_ENABLED,
                 'use_local_tts': USE_LOCAL_TTS,
-                'local_tts_engine': LOCAL_TTS_ENGINE
-                ,
+                'local_tts_engine': LOCAL_TTS_ENGINE,
                 'min_summary_sentences': MIN_SUMMARY_SENTENCES,
                 'max_summary_sentences': MAX_SUMMARY_SENTENCES
             }, f)
